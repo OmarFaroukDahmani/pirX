@@ -1,7 +1,10 @@
 import '../styling/Form.css';
+import Modal from './Modal';
 import { useState } from 'react';
 
 export default function Form() {
+    const [errorMessage , setErrorMessage] = useState(null)
+    const [showModel, setShowModal] = useState(false)
     const [formData, setFormData] = useState( {
         name: "",
         phone : "",
@@ -9,15 +12,32 @@ export default function Form() {
         employee : false,
         salary : 0
     } )
-    function handelButtonClick(){
-        if(formData.phone.length()>=12 ||  formData.phone.length()<=10  ){
-            alert("wrong phone number")
-        }if(formData.age >100 || formData.age < 18){
-            alert("wrong age")
+    function handelFormSubmit(event){
+        event.preventDefault();
+        setErrorMessage(null);
+        const {age , phone} = formData;
+        if( age < 18 || age > 100){
+            setErrorMessage("The age not allowed")
+        }else if(phone.length <10 || phone.length > 12){
+            setErrorMessage("Phone number format is wrong")
+        }
+        setShowModal(true)
+    }
+
+    function handelDivClick(){
+        if(showModel){
+            setShowModal(false)
         }
     }
+    let formNotEmpty = true;
+    if (formData.name != "" || formData.phone != "" || formData.age != "" ){
+        formNotEmpty = false
+    }
     return(
-        <div className="form">
+        
+        <div className="form"
+        onClick={handelDivClick}
+        >
             <h1>Requesting a Loan</h1>
             <form>
                 <label>Name :</label>
@@ -70,8 +90,9 @@ export default function Form() {
                     <option value="3">2000$ - 3000$</option>
                 </select>
 
-                <button onClick={handelButtonClick}  >Submit</button>
+                <button onClick={handelFormSubmit} className={formNotEmpty ? 'disabled' : ""} disabled={formNotEmpty} >Submit</button>
             </form>
+            <Modal errorMessage={errorMessage} isVisible={showModel} />
         </div>
     )
 }
